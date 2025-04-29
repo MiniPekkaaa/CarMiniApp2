@@ -88,6 +88,10 @@ def add_auto():
             'year': data.get('year'),
             'location': data.get('location'),
             'price': data.get('price'),
+            'first_registration': data.get('first_registration'),
+            'mileage': data.get('mileage'),
+            'fuel_type': data.get('fuel_type'),
+            'import_from': data.get('import_from'),
             'created_at': datetime.now()
         })
         
@@ -104,6 +108,10 @@ def search_auto():
         year = request.args.get('year')
         location = request.args.get('location')
         price = request.args.get('price')
+        first_registration = request.args.get('first_registration')
+        mileage = request.args.get('mileage')
+        fuel_type = request.args.get('fuel_type')
+        import_from = request.args.get('import_from')
 
         # Создаем фильтр для поиска
         search_filter = {}
@@ -117,6 +125,14 @@ def search_auto():
             search_filter['location'] = location
         if price:
             search_filter['price'] = {'$lte': float(price)}
+        if first_registration:
+            search_filter['first_registration'] = first_registration
+        if mileage:
+            search_filter['mileage'] = {'$lte': float(mileage)}
+        if fuel_type:
+            search_filter['fuel_type'] = fuel_type
+        if import_from:
+            search_filter['import_from'] = import_from
 
         # Ищем автомобили по фильтру
         autos = list(mongo.db.CurrentAuto.find(search_filter))
