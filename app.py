@@ -146,9 +146,11 @@ def get_catalog():
         catalog_raw = redis_client.get('auto:catalog')
         if not catalog_raw:
             return jsonify([])
-        # Преобразуем строку в массив
-        catalog = json.loads(f'[{catalog_raw}]')
-        return jsonify(catalog)
+        catalog_raw = catalog_raw.strip()
+        items = [item.strip() for item in catalog_raw.split(',')]
+        # Убираем кавычки в начале и конце каждого элемента
+        items = [item.strip('"') for item in items]
+        return jsonify(items)
     except Exception as e:
         logger.error(f"Error getting catalog: {str(e)}")
         return jsonify([]), 500
