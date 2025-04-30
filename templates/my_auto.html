@@ -56,6 +56,7 @@
         <button class="btn btn-danger mb-2" id="unsubscribeBtn">Отписаться от авто</button>
         <button class="btn btn-success" id="exitBtn">Выйти</button>
     </div>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         const user_id = "{{ user_id }}";
         document.getElementById('changeBtn').onclick = async function() {
@@ -72,14 +73,14 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id })
             });
-            if (window.Telegram && window.Telegram.WebApp) {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
                 window.Telegram.WebApp.close();
             } else {
                 window.close();
             }
         };
         document.getElementById('exitBtn').onclick = function() {
-            if (window.Telegram && window.Telegram.WebApp) {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
                 window.Telegram.WebApp.close();
             } else {
                 window.close();
