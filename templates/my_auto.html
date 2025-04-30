@@ -38,6 +38,35 @@
         .btn-success { background: #22c55e; color: #fff; }
         .btn-success:hover { background: #16a34a; }
         h1 { color: #fff; font-size: 2rem; font-weight: 700; }
+        /* Toast notification */
+        #toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #23272f;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px 24px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 40px;
+            font-size: 1rem;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.3s, fadeout 0.3s 1.2s;
+        }
+        @keyframes fadein {
+            from {bottom: 20px; opacity: 0;}
+            to {bottom: 40px; opacity: 1;}
+        }
+        @keyframes fadeout {
+            from {bottom: 40px; opacity: 1;}
+            to {bottom: 60px; opacity: 0;}
+        }
     </style>
 </head>
 <body>
@@ -56,11 +85,18 @@
         <button class="btn btn-danger mb-2" id="unsubscribeBtn">Отписаться от авто</button>
         <button class="btn btn-success" id="exitBtn">Выйти</button>
     </div>
+    <div id="toast"></div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         const user_id = "{{ user_id }}";
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'show';
+            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 1500);
+        }
         document.getElementById('changeBtn').onclick = async function() {
             await fetch('/unsubscribe_auto', {
                 method: 'POST',
@@ -69,8 +105,14 @@
             });
             window.location.href = '/?user_id=' + user_id;
         };
-        document.getElementById('unsubscribeBtn').onclick = function() {
-            tg.close();
+        document.getElementById('unsubscribeBtn').onclick = async function() {
+            await fetch('/unsubscribe_auto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id })
+            });
+            showToast('Подписка отменена');
+            setTimeout(() => { tg.close(); }, 1500);
         };
         document.getElementById('exitBtn').onclick = function() {
             tg.close();
