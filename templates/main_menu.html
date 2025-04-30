@@ -120,6 +120,12 @@
             color: #888;
             pointer-events: none;
         }
+        /* Исправление для отключённого поля 'Модель' */
+        #model:disabled {
+            background-color: #23272f;
+            color: #888;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -262,10 +268,8 @@
 
         function createAutocomplete(input, arr, onSelect) {
             let currentFocus;
-            input.addEventListener('input', function() {
-                let val = this.value;
+            function showList(val) {
                 closeAllLists();
-                if (!val) return false;
                 currentFocus = -1;
                 let list = document.createElement('div');
                 list.setAttribute('class', 'autocomplete-items');
@@ -273,7 +277,7 @@
                 list.style.top = (input.offsetTop + input.offsetHeight) + 'px';
                 list.style.width = input.offsetWidth + 'px';
                 input.parentNode.appendChild(list);
-                arr.filter(x => x.toLowerCase().includes(val.toLowerCase())).forEach(item => {
+                arr.filter(x => !val || x.toLowerCase().includes(val.toLowerCase())).forEach(item => {
                     let itemDiv = document.createElement('div');
                     itemDiv.innerHTML = item;
                     itemDiv.addEventListener('mousedown', function(e) {
@@ -283,11 +287,12 @@
                     });
                     list.appendChild(itemDiv);
                 });
+            }
+            input.addEventListener('input', function() {
+                showList(this.value);
             });
             input.addEventListener('focus', function() {
-                if (arr.length > 0) {
-                    this.dispatchEvent(new Event('input'));
-                }
+                showList('');
             });
             input.addEventListener('blur', function() {
                 setTimeout(closeAllLists, 150);
