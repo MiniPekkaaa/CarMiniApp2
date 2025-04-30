@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask_pymongo import PyMongo
 import logging
 import redis
@@ -77,7 +77,11 @@ def index():
         user_id = request.args.get('user_id')
         if not user_id or not check_user_registration(user_id):
             return render_template('unauthorized.html')
-        return render_template('main_menu.html')
+        # Проверка подписки пользователя
+        sub = mongo.db.UserAuto.find_one({'UserID': str(user_id)})
+        if sub:
+            return redirect(url_for('my_auto', user_id=user_id))
+        return render_template('main_menu.html', user_id=user_id)
     except Exception as e:
         logger.error(f"Error in index route: {str(e)}", exc_info=True)
         return f"Error: {str(e)}", 500
@@ -157,6 +161,47 @@ def get_catalog():
     except Exception as e:
         logger.error(f"Error getting catalog: {str(e)}")
         return jsonify([]), 500
+
+@app.route('/subscribe_auto', methods=['POST'])
+def subscribe_auto():
+    try:
+        data = request.json
+        user_id = request.args.get('user_id') or data.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'error': 'Нет user_id'}), 400
+        # Проверяем, есть ли уже подписка
+        if mongo.db.UserAuto.find_one({'UserID': str(user_id)}):
+            return jsonify({'success': False, 'error': 'Уже есть подписка'}), 400
+        data['UserID'] = str(user_id)
+        mongo.db.UserAuto.insert_one(data)
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error subscribing auto: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/my_auto')
+def my_auto():
+    try:
+        user_id = request.args.get('user_id')
+        sub = mongo.db.UserAuto.find_one({'UserID': str(user_id)})
+        if not sub:
+            return redirect(url_for('index', user_id=user_id))
+        return render_template('my_auto.html', auto=sub, user_id=user_id)
+    except Exception as e:
+        logger.error(f"Error in my_auto: {str(e)}")
+        return f"Error: {str(e)}", 500
+
+@app.route('/unsubscribe_auto', methods=['POST'])
+def unsubscribe_auto():
+    try:
+        user_id = request.args.get('user_id') or request.json.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'error': 'Нет user_id'}), 400
+        mongo.db.UserAuto.delete_one({'UserID': str(user_id)})
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error unsubscribing auto: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

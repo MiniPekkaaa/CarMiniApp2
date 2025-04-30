@@ -137,16 +137,8 @@
                 <option value="Гибрид">Гибрид</option>
             </select>
 
-            <button type="submit" class="btn btn-primary">Поиск</button>
-            <button type="button" class="btn btn-success" id="addAutoBtn">Добавить авто</button>
+            <button type="button" class="btn btn-success" id="subscribeBtn">Подписаться на авто</button>
         </form>
-
-        <div class="results mt-4">
-            <h2>Результаты поиска</h2>
-            <div id="searchResults">
-                <!-- Здесь будут отображаться результаты -->
-            </div>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -235,14 +227,18 @@
                 alert('Ошибка при поиске автомобилей');
             }
         });
-        document.getElementById('addAutoBtn').addEventListener('click', async () => {
+        document.getElementById('subscribeBtn').addEventListener('click', async () => {
             const formData = new FormData(document.getElementById('searchForm'));
             const autoData = {};
             for (let [key, value] of formData.entries()) {
                 if (value) autoData[key] = value;
             }
+            // Получаем user_id из Telegram WebApp
+            let tg = window.Telegram && window.Telegram.WebApp;
+            let user_id = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id;
+            if (user_id) autoData.user_id = user_id;
             try {
-                const response = await fetch('/add_auto', {
+                const response = await fetch('/subscribe_auto', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -251,14 +247,14 @@
                 });
                 const result = await response.json();
                 if (result.success) {
-                    alert('Автомобиль успешно добавлен');
+                    alert('Автомобиль успешно подписан');
                     document.getElementById('searchForm').reset();
                 } else {
-                    alert('Ошибка при добавлении автомобиля');
+                    alert('Ошибка при подписке на автомобиль');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Ошибка при добавлении автомобиля');
+                alert('Ошибка при подписке на автомобиль');
             }
         });
         function displayResults(autos) {
