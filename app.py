@@ -172,6 +172,10 @@ def subscribe_auto():
         # Проверяем, есть ли уже подписка
         if mongo.db.UserAuto.find_one({'UserID': str(user_id)}):
             return jsonify({'success': False, 'error': 'Уже есть подписка'}), 400
+        # Гарантируем, что все поля есть
+        for field in ['brand', 'model', 'year', 'price', 'mileage', 'fuel_type']:
+            if field not in data:
+                data[field] = ''
         data['UserID'] = str(user_id)
         mongo.db.UserAuto.insert_one(data)
         return jsonify({'success': True})
