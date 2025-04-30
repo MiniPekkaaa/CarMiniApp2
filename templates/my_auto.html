@@ -27,9 +27,9 @@
             width: 100%;
             margin-bottom: 14px;
             border-radius: 12px;
-            font-size: 1.15rem;
-            font-weight: 600;
-            padding: 16px 0;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 10px 0;
         }
         .btn-danger { background: #ef4444; color: #fff; }
         .btn-danger:hover { background: #b91c1c; }
@@ -45,12 +45,12 @@
         <h1 class="mb-4">Моя подписка</h1>
         <div class="card p-4 mb-4">
             <h5 class="mb-3">Ваш автомобиль:</h5>
-            <div><b>Марка:</b> {{ auto.brand }}</div>
-            <div><b>Модель:</b> {{ auto.model }}</div>
-            <div><b>Год:</b> {{ auto.year }}</div>
-            <div><b>Цена до:</b> {{ auto.price }}</div>
-            <div><b>Пробег до:</b> {{ auto.mileage }}</div>
-            <div><b>Вид топлива:</b> {{ auto.fuel_type }}</div>
+            <div><b>Марка:</b> {{ auto.brand or 'не важно' }}</div>
+            <div><b>Модель:</b> {{ auto.model or 'не важно' }}</div>
+            <div><b>Год:</b> {{ auto.year or 'не важно' }}</div>
+            <div><b>Цена до:</b> {{ auto.price or 'не важно' }}</div>
+            <div><b>Пробег до:</b> {{ auto.mileage or 'не важно' }}</div>
+            <div><b>Вид топлива:</b> {{ auto.fuel_type or 'не важно' }}</div>
         </div>
         <button class="btn btn-secondary mb-2" id="changeBtn">Подписаться на другое авто</button>
         <button class="btn btn-danger mb-2" id="unsubscribeBtn">Отписаться от авто</button>
