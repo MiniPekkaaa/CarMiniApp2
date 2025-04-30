@@ -149,13 +149,13 @@
             <input type="text" class="form-control mb-3" id="model" name="model" autocomplete="off" disabled>
 
             <label for="year" class="form-label">Год</label>
-            <input type="number" class="form-control mb-3" id="year" name="year">
+            <input type="number" class="form-control mb-3" id="year" name="year" inputmode="numeric" pattern="[0-9]*">
 
             <label for="price" class="form-label">Цена до</label>
-            <input type="number" class="form-control mb-3" id="price" name="price">
+            <input type="number" class="form-control mb-3" id="price" name="price" inputmode="numeric" pattern="[0-9]*">
 
             <label for="mileage" class="form-label">Пробег до</label>
-            <input type="number" class="form-control mb-3" id="mileage" name="mileage" placeholder="км">
+            <input type="number" class="form-control mb-3" id="mileage" name="mileage" placeholder="км" inputmode="numeric" pattern="[0-9]*">
 
             <label for="fuel_type" class="form-label">Вид топлива</label>
             <select class="form-control mb-4" id="fuel_type" name="fuel_type">
