@@ -15,11 +15,8 @@
             width: 100%;
             margin: 0 auto;
         }
-        .search-form {
-            padding: 0;
-            background: none;
-            box-shadow: none;
-            border-radius: 0;
+        form#searchForm {
+            position: relative;
         }
         .form-label {
             color: #fff;
@@ -35,9 +32,33 @@
             font-size: 1.15rem;
             min-height: 48px;
         }
-        .form-control::placeholder {
+        #model:disabled {
+            background-color: #23272f;
             color: #888;
-            font-size: 1.05rem;
+            opacity: 1;
+        }
+        .autocomplete-items {
+            position: absolute !important;
+            left: 0;
+            right: 0;
+            top: 100%;
+            background: #23272f;
+            z-index: 9999;
+            width: 100%;
+            max-height: 220px;
+            overflow-y: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border: 1.5px solid #2c313a;
+        }
+        .autocomplete-items div {
+            padding: 12px 18px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 1.08rem;
+        }
+        .autocomplete-items div:hover {
+            background: #3b82f6;
         }
         .btn-primary, .btn-success {
             width: 100%;
@@ -86,46 +107,6 @@
             color: #d1d5db;
             font-size: 1.05rem;
         }
-        form#searchForm {
-            position: relative;
-        }
-        .autocomplete-items {
-            position: absolute !important;
-            left: 0;
-            right: 0;
-            top: 100%;
-            background: #23272f;
-            z-index: 9999;
-            width: 100%;
-            max-height: 220px;
-            overflow-y: auto;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            border: 1.5px solid #2c313a;
-        }
-        .autocomplete-items div {
-            padding: 12px 18px;
-            cursor: pointer;
-            color: #fff;
-            font-size: 1.08rem;
-        }
-        .autocomplete-items div:hover {
-            background: #3b82f6;
-        }
-        .autocomplete-arrow {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
-            pointer-events: none;
-        }
-        /* Исправление для отключённого поля 'Модель' */
-        #model:disabled {
-            background-color: #23272f;
-            color: #888;
-            opacity: 1;
-        }
     </style>
 </head>
 <body>
@@ -133,10 +114,10 @@
         <h1 class="mb-4">Поиск автомобилей</h1>
         <form id="searchForm">
             <label for="brand" class="form-label">Марка</label>
-            <input type="text" class="form-control mb-3" id="brand" name="brand">
+            <input type="text" class="form-control mb-3" id="brand" name="brand" autocomplete="off">
 
             <label for="model" class="form-label">Модель</label>
-            <input type="text" class="form-control mb-3" id="model" name="model">
+            <input type="text" class="form-control mb-3" id="model" name="model" autocomplete="off" disabled>
 
             <label for="year" class="form-label">Год</label>
             <input type="number" class="form-control mb-3" id="year" name="year">
@@ -170,84 +151,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('searchForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const params = new URLSearchParams();
-            
-            for (let [key, value] of formData.entries()) {
-                if (value) params.append(key, value);
-            }
-
-            try {
-                const response = await fetch(`/search_auto?${params.toString()}`);
-                const data = await response.json();
-                displayResults(data);
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Ошибка при поиске автомобилей');
-            }
-        });
-
-        document.getElementById('addAutoBtn').addEventListener('click', async () => {
-            const formData = new FormData(document.getElementById('searchForm'));
-            const autoData = {};
-            
-            for (let [key, value] of formData.entries()) {
-                if (value) autoData[key] = value;
-            }
-
-            try {
-                const response = await fetch('/add_auto', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(autoData)
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    alert('Автомобиль успешно добавлен');
-                    document.getElementById('searchForm').reset();
-                } else {
-                    alert('Ошибка при добавлении автомобиля');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Ошибка при добавлении автомобиля');
-            }
-        });
-
-        function displayResults(autos) {
-            const resultsDiv = document.getElementById('searchResults');
-            resultsDiv.innerHTML = '';
-
-            if (autos.length === 0) {
-                resultsDiv.innerHTML = '<p class="col-12">Ничего не найдено</p>';
-                return;
-            }
-
-            autos.forEach(auto => {
-                const autoCard = document.createElement('div');
-                autoCard.className = 'col-md-4';
-                autoCard.innerHTML = `
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">${auto.brand} ${auto.model}</h5>
-                            <p class="card-text">
-                                Год: ${auto.year}<br>
-                                Цена: ${auto.price} €<br>
-                                Пробег: ${auto.mileage ? auto.mileage + ' км' : 'Не указано'}<br>
-                                Вид топлива: ${auto.fuel_type || 'Не указано'}
-                            </p>
-                        </div>
-                    </div>
-                `;
-                resultsDiv.appendChild(autoCard);
-            });
-        }
-
         // --- Автодополнение для марки и модели ---
         let catalog = [];
         let brands = [];
@@ -314,6 +217,76 @@
             });
             modelInput.disabled = true;
         });
+
+        // --- Оставшийся JS для поиска и добавления авто ---
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams();
+            for (let [key, value] of formData.entries()) {
+                if (value) params.append(key, value);
+            }
+            try {
+                const response = await fetch(`/search_auto?${params.toString()}`);
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Ошибка при поиске автомобилей');
+            }
+        });
+        document.getElementById('addAutoBtn').addEventListener('click', async () => {
+            const formData = new FormData(document.getElementById('searchForm'));
+            const autoData = {};
+            for (let [key, value] of formData.entries()) {
+                if (value) autoData[key] = value;
+            }
+            try {
+                const response = await fetch('/add_auto', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(autoData)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Автомобиль успешно добавлен');
+                    document.getElementById('searchForm').reset();
+                } else {
+                    alert('Ошибка при добавлении автомобиля');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Ошибка при добавлении автомобиля');
+            }
+        });
+        function displayResults(autos) {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '';
+            if (autos.length === 0) {
+                resultsDiv.innerHTML = '<p class="col-12">Ничего не найдено</p>';
+                return;
+            }
+            autos.forEach(auto => {
+                const autoCard = document.createElement('div');
+                autoCard.className = 'col-md-4';
+                autoCard.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${auto.brand} ${auto.model}</h5>
+                            <p class="card-text">
+                                Год: ${auto.year}<br>
+                                Цена: ${auto.price} €<br>
+                                Пробег: ${auto.mileage ? auto.mileage + ' км' : 'Не указано'}<br>
+                                Вид топлива: ${auto.fuel_type || 'Не указано'}
+                            </p>
+                        </div>
+                    </div>
+                `;
+                resultsDiv.appendChild(autoCard);
+            });
+        }
     </script>
 </body>
 </html> 
