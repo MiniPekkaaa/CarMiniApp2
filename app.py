@@ -77,7 +77,7 @@ def index():
         if not user_id or not check_user_registration(user_id):
             return render_template('unauthorized.html')
         # Проверка подписки пользователя
-        sub = mongo.db.CurrentAuto.find_one({'UserID': str(user_id)})
+        sub = mongo.db.CurrentAuto.find_one({'user_id': str(user_id)})
         if sub:
             return redirect(url_for('my_auto', user_id=user_id))
         return render_template('main_menu.html', user_id=user_id)
@@ -169,13 +169,16 @@ def subscribe_auto():
         if not user_id:
             return jsonify({'success': False, 'error': 'Нет user_id'}), 400
         # Проверяем, есть ли уже подписка
-        if mongo.db.CurrentAuto.find_one({'UserID': str(user_id)}):
+        if mongo.db.CurrentAuto.find_one({'user_id': str(user_id)}):
             return jsonify({'success': False, 'error': 'Уже есть подписка'}), 400
         # Гарантируем, что все поля есть
         for field in ['brand', 'model', 'year', 'price', 'mileage', 'fuel_type']:
             if field not in data:
                 data[field] = ''
-        data['UserID'] = str(user_id)
+        data['user_id'] = str(user_id)
+        # Удаляем лишнее поле UserID если оно есть
+        if 'UserID' in data:
+            del data['UserID']
         mongo.db.CurrentAuto.insert_one(data)
         return jsonify({'success': True})
     except Exception as e:
@@ -186,7 +189,7 @@ def subscribe_auto():
 def my_auto():
     try:
         user_id = request.args.get('user_id')
-        sub = mongo.db.CurrentAuto.find_one({'UserID': str(user_id)})
+        sub = mongo.db.CurrentAuto.find_one({'user_id': str(user_id)})
         if not sub:
             return redirect(url_for('index', user_id=user_id))
         return render_template('my_auto.html', auto=sub, user_id=user_id)
@@ -200,7 +203,7 @@ def unsubscribe_auto():
         user_id = request.args.get('user_id') or request.json.get('user_id')
         if not user_id:
             return jsonify({'success': False, 'error': 'Нет user_id'}), 400
-        mongo.db.CurrentAuto.delete_one({'UserID': str(user_id)})
+        mongo.db.CurrentAuto.delete_one({'user_id': str(user_id)})
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error unsubscribing auto: {str(e)}")
