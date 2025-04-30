@@ -8,7 +8,12 @@
     <style>
         body {
             padding: 20px;
-            background-color: #f8f9fa;
+            background-color: #181818;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
         }
         .search-form {
             background-color: white;
@@ -45,23 +50,8 @@
                         <input type="number" class="form-control" id="year" name="year">
                     </div>
                     <div class="col-md-6">
-                        <label for="location" class="form-label">Город</label>
-                        <input type="text" class="form-control" id="location" name="location">
-                    </div>
-                    <div class="col-md-6">
                         <label for="price" class="form-label">Цена до</label>
                         <input type="number" class="form-control" id="price" name="price">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="first_registration" class="form-label">Первая регистрация</label>
-                        <select class="form-control" id="first_registration" name="first_registration">
-                            <option value="">Не важно</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                            <option value="2021">2021</option>
-                            <option value="2020">2020</option>
-                        </select>
                     </div>
                     <div class="col-md-6">
                         <label for="mileage" class="form-label">Пробег до</label>
@@ -75,16 +65,6 @@
                             <option value="Дизель">Дизель</option>
                             <option value="Электро">Электро</option>
                             <option value="Гибрид">Гибрид</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="import_from" class="form-label">Импорт автомобилей из</label>
-                        <select class="form-control" id="import_from" name="import_from">
-                            <option value="">Не важно</option>
-                            <option value="Германия">Германия</option>
-                            <option value="США">США</option>
-                            <option value="Япония">Япония</option>
-                            <option value="Корея">Корея</option>
                         </select>
                     </div>
                     <div class="col-12">
@@ -172,12 +152,9 @@
                             <h5 class="card-title">${auto.brand} ${auto.model}</h5>
                             <p class="card-text">
                                 Год: ${auto.year}<br>
-                                Город: ${auto.location}<br>
                                 Цена: ${auto.price} €<br>
-                                Первая регистрация: ${auto.first_registration || 'Не указано'}<br>
                                 Пробег: ${auto.mileage ? auto.mileage + ' км' : 'Не указано'}<br>
-                                Вид топлива: ${auto.fuel_type || 'Не указано'}<br>
-                                Импорт из: ${auto.import_from || 'Не указано'}
+                                Вид топлива: ${auto.fuel_type || 'Не указано'}
                             </p>
                         </div>
                     </div>
