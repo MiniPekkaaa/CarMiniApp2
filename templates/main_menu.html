@@ -250,7 +250,7 @@
                     alert('Автомобиль успешно подписан');
                     document.getElementById('searchForm').reset();
                 } else {
-                    alert('Ошибка при подписке на автомобиль');
+                    alert(result.error || 'Ошибка при подписке на автомобиль');
                 }
             } catch (error) {
                 console.error('Error:', error);
