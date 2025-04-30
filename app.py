@@ -4,6 +4,7 @@ import logging
 import redis
 from datetime import datetime
 import json
+import ast
 
 # Настройка логирования
 logging.basicConfig(
@@ -146,10 +147,12 @@ def get_catalog():
         catalog_raw = redis_client.get('auto:catalog')
         if not catalog_raw:
             return jsonify([])
-        catalog_raw = catalog_raw.strip()
-        items = [item.strip() for item in catalog_raw.split(',')]
-        # Убираем кавычки в начале и конце каждого элемента
-        items = [item.strip('"') for item in items]
+        try:
+            items = ast.literal_eval(f'[{catalog_raw}]')
+            items = [str(x) for x in items]
+        except Exception as parse_err:
+            logger.error(f"Catalog parse error: {parse_err}, raw: {catalog_raw}")
+            items = [x.strip().strip('"') for x in catalog_raw.split(',')]
         return jsonify(items)
     except Exception as e:
         logger.error(f"Error getting catalog: {str(e)}")
