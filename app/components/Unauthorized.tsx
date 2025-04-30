@@ -3,7 +3,7 @@ import { Button, Typography, Box } from '@mui/material';
 
 const Unauthorized = () => {
   const handleRedirectToBot = () => {
-    window.open('https://t.me/your_bot_name', '_blank');
+    window.open('https://t.me/car_founder_de_bot', '_blank');
   };
 
   return (
@@ -23,7 +23,7 @@ const Unauthorized = () => {
         color="primary"
         onClick={handleRedirectToBot}
       >
-        Пройти регистрацию в боте
+        Продолжить регистрацию в боте
       </Button>
     </Box>
   );
