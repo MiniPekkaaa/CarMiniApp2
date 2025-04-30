@@ -33,10 +33,9 @@ def check_user_registration(user_id):
         user_data = redis_client.hgetall(f'auto:user:{user_id}')
         logger.debug(f"Redis data for user {user_id}: {user_data}")
         
-        # Проверяем наличие данных, совпадение UserChatID и статус регистрации
+        # Проверяем наличие данных и статус регистрации
         registration_complete = (
             bool(user_data) and 
-            user_data.get('UserChatID') == str(user_id) and
             user_data.get('current_step') == 'complete'
         )
         
