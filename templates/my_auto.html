@@ -58,6 +58,8 @@
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
         const user_id = "{{ user_id }}";
         document.getElementById('changeBtn').onclick = async function() {
             await fetch('/unsubscribe_auto', {
@@ -67,24 +69,11 @@
             });
             window.location.href = '/?user_id=' + user_id;
         };
-        document.getElementById('unsubscribeBtn').onclick = async function() {
-            await fetch('/unsubscribe_auto', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id })
-            });
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
-                window.Telegram.WebApp.close();
-            } else {
-                window.close();
-            }
+        document.getElementById('unsubscribeBtn').onclick = function() {
+            tg.close();
         };
         document.getElementById('exitBtn').onclick = function() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
-                window.Telegram.WebApp.close();
-            } else {
-                window.close();
-            }
+            tg.close();
         };
     </script>
 </body>
