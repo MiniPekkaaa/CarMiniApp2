@@ -11,22 +11,72 @@
             background-color: #181818;
         }
         .container {
-            max-width: 900px;
+            max-width: 420px;
             width: 100%;
             margin: 0 auto;
         }
         .search-form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #23272f;
+            padding: 24px 18px;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.18);
             margin-bottom: 20px;
         }
-        .results {
-            background-color: white;
-            padding: 20px;
+        .form-label {
+            color: #fff;
+            font-weight: 500;
+        }
+        .form-control, .form-control:focus, .form-select, select.form-control {
+            background-color: #181c22;
+            color: #fff;
+            border: 1px solid #2c313a;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: none;
+        }
+        .form-control::placeholder {
+            color: #888;
+        }
+        .btn-primary, .btn-success {
+            width: 100%;
+            margin-bottom: 10px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn-success {
+            background: #22c55e;
+        }
+        .btn-primary:hover, .btn-success:hover {
+            background: #2563eb;
+        }
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        h1, h2 {
+            color: #fff;
+        }
+        .results {
+            background-color: #23272f;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+        }
+        .card {
+            background: #181c22;
+            color: #fff;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+        .card-title {
+            color: #fff;
+        }
+        .card-text {
+            color: #d1d5db;
         }
     </style>
 </head>
