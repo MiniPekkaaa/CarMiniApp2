@@ -227,15 +227,25 @@
                 alert('Ошибка при поиске автомобилей');
             }
         });
+        // Получаем user_id из Telegram WebApp или из URL
+        function getUserId() {
+            let tg = window.Telegram && window.Telegram.WebApp;
+            let user_id = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id;
+            if (!user_id) {
+                // Пробуем взять из URL
+                const params = new URLSearchParams(window.location.search);
+                user_id = params.get('user_id');
+            }
+            return user_id;
+        }
+
         document.getElementById('subscribeBtn').addEventListener('click', async () => {
             const formData = new FormData(document.getElementById('searchForm'));
             const autoData = {};
             for (let [key, value] of formData.entries()) {
                 if (value) autoData[key] = value;
             }
-            // Получаем user_id из Telegram WebApp
-            let tg = window.Telegram && window.Telegram.WebApp;
-            let user_id = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id;
+            let user_id = getUserId();
             if (user_id) autoData.user_id = user_id;
             try {
                 const response = await fetch('/subscribe_auto', {
