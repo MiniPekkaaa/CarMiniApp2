@@ -333,6 +333,14 @@
                 resultsDiv.appendChild(autoCard);
             });
         }
+        // Ограничение только на цифры для полей 'Год', 'Цена до', 'Пробег до'
+        function onlyDigitsInput(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (e.target.value !== v) e.target.value = v;
+        }
+        document.getElementById('year').addEventListener('input', onlyDigitsInput);
+        document.getElementById('price').addEventListener('input', onlyDigitsInput);
+        document.getElementById('mileage').addEventListener('input', onlyDigitsInput);
     </script>
 </body>
 </html> 
