@@ -91,51 +91,38 @@
 <body>
     <div class="container">
         <h1 class="mb-4">Поиск автомобилей</h1>
-        
-        <div class="search-form">
-            <form id="searchForm">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="brand" class="form-label">Марка</label>
-                        <input type="text" class="form-control" id="brand" name="brand">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="model" class="form-label">Модель</label>
-                        <input type="text" class="form-control" id="model" name="model">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="year" class="form-label">Год</label>
-                        <input type="number" class="form-control" id="year" name="year">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="price" class="form-label">Цена до</label>
-                        <input type="number" class="form-control" id="price" name="price">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="mileage" class="form-label">Пробег до</label>
-                        <input type="number" class="form-control" id="mileage" name="mileage" placeholder="км">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="fuel_type" class="form-label">Вид топлива</label>
-                        <select class="form-control" id="fuel_type" name="fuel_type">
-                            <option value="">Не важно</option>
-                            <option value="Бензин">Бензин</option>
-                            <option value="Дизель">Дизель</option>
-                            <option value="Электро">Электро</option>
-                            <option value="Гибрид">Гибрид</option>
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Поиск</button>
-                        <button type="button" class="btn btn-success" id="addAutoBtn">Добавить авто</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+        <form id="searchForm">
+            <label for="brand" class="form-label">Марка</label>
+            <input type="text" class="form-control mb-3" id="brand" name="brand">
 
-        <div class="results">
+            <label for="model" class="form-label">Модель</label>
+            <input type="text" class="form-control mb-3" id="model" name="model">
+
+            <label for="year" class="form-label">Год</label>
+            <input type="number" class="form-control mb-3" id="year" name="year">
+
+            <label for="price" class="form-label">Цена до</label>
+            <input type="number" class="form-control mb-3" id="price" name="price">
+
+            <label for="mileage" class="form-label">Пробег до</label>
+            <input type="number" class="form-control mb-3" id="mileage" name="mileage" placeholder="км">
+
+            <label for="fuel_type" class="form-label">Вид топлива</label>
+            <select class="form-control mb-4" id="fuel_type" name="fuel_type">
+                <option value="">Не важно</option>
+                <option value="Бензин">Бензин</option>
+                <option value="Дизель">Дизель</option>
+                <option value="Электро">Электро</option>
+                <option value="Гибрид">Гибрид</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary">Поиск</button>
+            <button type="button" class="btn btn-success" id="addAutoBtn">Добавить авто</button>
+        </form>
+
+        <div class="results mt-4">
             <h2>Результаты поиска</h2>
-            <div id="searchResults" class="row g-4">
+            <div id="searchResults">
                 <!-- Здесь будут отображаться результаты -->
             </div>
         </div>
