@@ -28,7 +28,7 @@ redis_client = redis.Redis(
 def check_user_registration(user_id):
     try:
         # Проверяем существование пользователя в Redis
-        user_data = redis_client.hgetall(f'beer:user:{user_id}')
+        user_data = redis_client.hgetall(f'auto:user:{user_id}')
         logger.debug(f"Redis data for user {user_id}: {user_data}")
         
         # Проверяем наличие данных, совпадение UserChatID и статус регистрации
