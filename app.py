@@ -3,6 +3,7 @@ from flask_pymongo import PyMongo
 import logging
 import redis
 from datetime import datetime
+import json
 
 # Настройка логирования
 logging.basicConfig(
@@ -138,6 +139,19 @@ def search_auto():
     except Exception as e:
         logger.error(f"Error searching autos: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/get_catalog')
+def get_catalog():
+    try:
+        catalog_raw = redis_client.get('auto:catalog')
+        if not catalog_raw:
+            return jsonify([])
+        # Преобразуем строку в массив
+        catalog = json.loads(f'[{catalog_raw}]')
+        return jsonify(catalog)
+    except Exception as e:
+        logger.error(f"Error getting catalog: {str(e)}")
+        return jsonify([]), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
