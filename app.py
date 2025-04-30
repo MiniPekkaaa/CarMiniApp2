@@ -72,6 +72,9 @@ def check_auth():
 @app.route('/')
 def index():
     try:
+        user_id = request.args.get('user_id')
+        if not user_id or not check_user_registration(user_id):
+            return render_template('unauthorized.html')
         return render_template('main_menu.html')
     except Exception as e:
         logger.error(f"Error in index route: {str(e)}", exc_info=True)
