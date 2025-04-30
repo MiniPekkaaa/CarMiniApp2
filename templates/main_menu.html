@@ -207,6 +207,76 @@
                 resultsDiv.appendChild(autoCard);
             });
         }
+
+        // --- Автодополнение для марки и модели ---
+        let catalog = [];
+        let brands = [];
+        let modelsByBrand = {};
+
+        async function fetchCatalog() {
+            const res = await fetch('/get_catalog');
+            catalog = await res.json();
+            brands = [];
+            modelsByBrand = {};
+            catalog.forEach(item => {
+                const [brand, model] = item.split('|');
+                if (!brands.includes(brand)) brands.push(brand);
+                if (!modelsByBrand[brand]) modelsByBrand[brand] = [];
+                modelsByBrand[brand].push(model);
+            });
+        }
+
+        function createAutocomplete(input, arr, onSelect) {
+            let currentFocus;
+            input.addEventListener('input', function() {
+                let val = this.value;
+                closeAllLists();
+                if (!val) return false;
+                currentFocus = -1;
+                let list = document.createElement('div');
+                list.setAttribute('class', 'autocomplete-items');
+                list.style.position = 'absolute';
+                list.style.background = '#23272f';
+                list.style.zIndex = 1000;
+                list.style.width = this.offsetWidth + 'px';
+                list.style.maxHeight = '200px';
+                list.style.overflowY = 'auto';
+                list.style.borderRadius = '10px';
+                list.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                this.parentNode.appendChild(list);
+                arr.filter(x => x.toLowerCase().includes(val.toLowerCase())).forEach(item => {
+                    let itemDiv = document.createElement('div');
+                    itemDiv.innerHTML = item;
+                    itemDiv.style.padding = '10px 16px';
+                    itemDiv.style.cursor = 'pointer';
+                    itemDiv.addEventListener('mousedown', function(e) {
+                        input.value = item;
+                        closeAllLists();
+                        if (onSelect) onSelect(item);
+                    });
+                    list.appendChild(itemDiv);
+                });
+            });
+            input.addEventListener('blur', function() {
+                setTimeout(closeAllLists, 100);
+            });
+            function closeAllLists() {
+                let items = document.querySelectorAll('.autocomplete-items');
+                items.forEach(el => el.parentNode.removeChild(el));
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await fetchCatalog();
+            const brandInput = document.getElementById('brand');
+            const modelInput = document.getElementById('model');
+            createAutocomplete(brandInput, brands, (selectedBrand) => {
+                modelInput.value = '';
+                modelInput.disabled = false;
+                createAutocomplete(modelInput, modelsByBrand[selectedBrand] || []);
+            });
+            modelInput.disabled = true;
+        });
     </script>
 </body>
 </html> 
