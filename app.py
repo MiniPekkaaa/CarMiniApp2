@@ -97,6 +97,8 @@ def add_auto():
             'price': data.get('price'),
             'mileage': data.get('mileage'),
             'fuel_type': data.get('fuel_type'),
+            'power': data.get('power'),
+            'transmission': data.get('transmission'),
             'created_at': datetime.now()
         })
         
@@ -110,10 +112,16 @@ def search_auto():
     try:
         brand = request.args.get('brand')
         model = request.args.get('model')
-        year = request.args.get('year')
-        price = request.args.get('price')
-        mileage = request.args.get('mileage')
+        year_from = request.args.get('year_from')
+        year_to = request.args.get('year_to')
+        price_from = request.args.get('price_from')
+        price_to = request.args.get('price_to')
+        mileage_from = request.args.get('mileage_from')
+        mileage_to = request.args.get('mileage_to')
         fuel_type = request.args.get('fuel_type')
+        power_from = request.args.get('power_from')
+        power_to = request.args.get('power_to')
+        transmission = request.args.get('transmission')
 
         # Создаем фильтр для поиска
         search_filter = {}
@@ -121,14 +129,38 @@ def search_auto():
             search_filter['brand'] = brand
         if model:
             search_filter['model'] = model
-        if year:
-            search_filter['year'] = year
-        if price:
-            search_filter['price'] = {'$lte': float(price)}
-        if mileage:
-            search_filter['mileage'] = {'$lte': float(mileage)}
+        if year_from:
+            search_filter['year'] = {'$gte': int(year_from)}
+        if year_to:
+            if 'year' in search_filter:
+                search_filter['year']['$lte'] = int(year_to)
+            else:
+                search_filter['year'] = {'$lte': int(year_to)}
+        if price_from:
+            search_filter['price'] = {'$gte': float(price_from)}
+        if price_to:
+            if 'price' in search_filter:
+                search_filter['price']['$lte'] = float(price_to)
+            else:
+                search_filter['price'] = {'$lte': float(price_to)}
+        if mileage_from:
+            search_filter['mileage'] = {'$gte': float(mileage_from)}
+        if mileage_to:
+            if 'mileage' in search_filter:
+                search_filter['mileage']['$lte'] = float(mileage_to)
+            else:
+                search_filter['mileage'] = {'$lte': float(mileage_to)}
         if fuel_type:
             search_filter['fuel_type'] = fuel_type
+        if power_from:
+            search_filter['power'] = {'$gte': float(power_from)}
+        if power_to:
+            if 'power' in search_filter:
+                search_filter['power']['$lte'] = float(power_to)
+            else:
+                search_filter['power'] = {'$lte': float(power_to)}
+        if transmission:
+            search_filter['transmission'] = transmission
 
         # Ищем автомобили по фильтру
         autos = list(mongo.db.CurrentAuto.find(search_filter))
@@ -172,7 +204,8 @@ def subscribe_auto():
         if mongo.db.CurrentAuto.find_one({'user_id': str(user_id)}):
             return jsonify({'success': False, 'error': 'Уже есть подписка'}), 400
         # Гарантируем, что все поля есть
-        for field in ['brand', 'model', 'year', 'price', 'mileage', 'fuel_type']:
+        for field in ['brand', 'model', 'year_from', 'year_to', 'price_from', 'price_to', 
+                     'mileage_from', 'mileage_to', 'fuel_type', 'power_from', 'power_to', 'transmission']:
             if field not in data:
                 data[field] = ''
         data['user_id'] = str(user_id)

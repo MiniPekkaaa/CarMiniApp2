@@ -148,14 +148,53 @@
             <label for="model" class="form-label">Модель</label>
             <input type="text" class="form-control mb-3" id="model" name="model" autocomplete="off" disabled>
 
-            <label for="year" class="form-label">Год</label>
-            <input type="number" class="form-control mb-3" id="year" name="year" inputmode="numeric" pattern="[0-9]*">
+            <label for="year_from" class="form-label">Год от</label>
+            <select class="form-control mb-2" id="year_from" name="year_from">
+                <option value="">Не важно</option>
+            </select>
 
-            <label for="price" class="form-label">Цена до</label>
-            <input type="number" class="form-control mb-3" id="price" name="price" inputmode="numeric" pattern="[0-9]*">
+            <label for="year_to" class="form-label">Год до</label>
+            <select class="form-control mb-3" id="year_to" name="year_to">
+                <option value="">Не важно</option>
+            </select>
 
-            <label for="mileage" class="form-label">Пробег до</label>
-            <input type="number" class="form-control mb-3" id="mileage" name="mileage" placeholder="км" inputmode="numeric" pattern="[0-9]*">
+            <label for="price_from" class="form-label">Цена от</label>
+            <input type="number" class="form-control mb-2" id="price_from" name="price_from" inputmode="numeric" pattern="[0-9]*">
+
+            <label for="price_to" class="form-label">Цена до</label>
+            <input type="number" class="form-control mb-3" id="price_to" name="price_to" inputmode="numeric" pattern="[0-9]*">
+
+            <label for="mileage_from" class="form-label">Пробег от</label>
+            <select class="form-control mb-2" id="mileage_from" name="mileage_from">
+                <option value="">Не важно</option>
+                <option value="5000">5 000 км</option>
+                <option value="10000">10 000 км</option>
+                <option value="20000">20 000 км</option>
+                <option value="30000">30 000 км</option>
+                <option value="50000">50 000 км</option>
+                <option value="75000">75 000 км</option>
+                <option value="100000">100 000 км</option>
+                <option value="150000">150 000 км</option>
+                <option value="200000">200 000 км</option>
+                <option value="250000">250 000 км</option>
+                <option value="300000">300 000 км</option>
+            </select>
+
+            <label for="mileage_to" class="form-label">Пробег до</label>
+            <select class="form-control mb-3" id="mileage_to" name="mileage_to">
+                <option value="">Не важно</option>
+                <option value="5000">5 000 км</option>
+                <option value="10000">10 000 км</option>
+                <option value="20000">20 000 км</option>
+                <option value="30000">30 000 км</option>
+                <option value="50000">50 000 км</option>
+                <option value="75000">75 000 км</option>
+                <option value="100000">100 000 км</option>
+                <option value="150000">150 000 км</option>
+                <option value="200000">200 000 км</option>
+                <option value="250000">250 000 км</option>
+                <option value="300000">300 000 км</option>
+            </select>
 
             <label for="fuel_type" class="form-label">Вид топлива</label>
             <select class="form-control mb-4" id="fuel_type" name="fuel_type">
@@ -163,7 +202,24 @@
                 <option value="Бензин">Бензин</option>
                 <option value="Дизель">Дизель</option>
                 <option value="Электро">Электро</option>
-                <option value="Гибрид">Гибрид</option>
+                <option value="Гибрид (электрический / бензин)">Гибрид (электрический / бензин)</option>
+                <option value="Гибрид (электрический / дизель)">Гибрид (электрический / дизель)</option>
+                <option value="Природный газ (КПГ)">Природный газ (КПГ)</option>
+            </select>
+
+            <label for="power_from" class="form-label">Мощность от, kW</label>
+            <input type="number" class="form-control mb-2" id="power_from" name="power_from" inputmode="numeric" pattern="[0-9]*">
+
+            <label for="power_to" class="form-label">Мощность до, kW</label>
+            <input type="number" class="form-control mb-3" id="power_to" name="power_to" inputmode="numeric" pattern="[0-9]*">
+
+            <label for="transmission" class="form-label">Коробка передач</label>
+            <select class="form-control mb-4" id="transmission" name="transmission">
+                <option value="">Не важно</option>
+                <option value="Механическая">Механическая</option>
+                <option value="Автоматическая">Автоматическая</option>
+                <option value="Роботизированная">Роботизированная</option>
+                <option value="Вариатор">Вариатор</option>
             </select>
 
             <button type="button" class="btn btn-success" id="subscribeBtn">Подписаться на авто</button>
@@ -238,6 +294,22 @@
                 createAutocomplete(modelInput, modelsByBrand[selectedBrand] || []);
             });
             modelInput.disabled = true;
+            
+            // Заполнение выпадающих списков годов
+            const yearFrom = document.getElementById('year_from');
+            const yearTo = document.getElementById('year_to');
+            const currentYear = new Date().getFullYear();
+            for (let year = currentYear; year >= 1950; year--) {
+                const optionFrom = document.createElement('option');
+                optionFrom.value = year;
+                optionFrom.textContent = year;
+                yearFrom.appendChild(optionFrom);
+                
+                const optionTo = document.createElement('option');
+                optionTo.value = year;
+                optionTo.textContent = year;
+                yearTo.appendChild(optionTo);
+            }
         });
 
         // --- Оставшийся JS для поиска и добавления авто ---
@@ -338,9 +410,12 @@
             let v = e.target.value.replace(/\D/g, '');
             if (e.target.value !== v) e.target.value = v;
         }
-        document.getElementById('year').addEventListener('input', onlyDigitsInput);
-        document.getElementById('price').addEventListener('input', onlyDigitsInput);
-        document.getElementById('mileage').addEventListener('input', onlyDigitsInput);
+        document.getElementById('year_from').addEventListener('input', onlyDigitsInput);
+        document.getElementById('year_to').addEventListener('input', onlyDigitsInput);
+        document.getElementById('price_from').addEventListener('input', onlyDigitsInput);
+        document.getElementById('price_to').addEventListener('input', onlyDigitsInput);
+        document.getElementById('mileage_from').addEventListener('input', onlyDigitsInput);
+        document.getElementById('mileage_to').addEventListener('input', onlyDigitsInput);
     </script>
 </body>
 </html> 
