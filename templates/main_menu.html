@@ -167,7 +167,8 @@
             <input type="number" class="form-control mb-3" id="price_to" name="price_to" inputmode="numeric" pattern="[0-9]*">
 
             <label for="mileage_from" class="form-label">Пробег от</label>
-            <select class="form-control mb-2" id="mileage_from" name="mileage_from">
+            <input type="number" class="form-control mb-2" id="mileage_from" name="mileage_from" list="mileage_from_options" inputmode="numeric" pattern="[0-9]*">
+            <datalist id="mileage_from_options">
                 <option value="">Не важно</option>
                 <option value="5000">5 000 км</option>
                 <option value="10000">10 000 км</option>
@@ -180,10 +181,11 @@
                 <option value="200000">200 000 км</option>
                 <option value="250000">250 000 км</option>
                 <option value="300000">300 000 км</option>
-            </select>
+            </datalist>
 
             <label for="mileage_to" class="form-label">Пробег до</label>
-            <select class="form-control mb-3" id="mileage_to" name="mileage_to">
+            <input type="number" class="form-control mb-3" id="mileage_to" name="mileage_to" list="mileage_to_options" inputmode="numeric" pattern="[0-9]*">
+            <datalist id="mileage_to_options">
                 <option value="">Не важно</option>
                 <option value="5000">5 000 км</option>
                 <option value="10000">10 000 км</option>
@@ -196,7 +198,7 @@
                 <option value="200000">200 000 км</option>
                 <option value="250000">250 000 км</option>
                 <option value="300000">300 000 км</option>
-            </select>
+            </datalist>
 
             <label for="fuel_type" class="form-label">Вид топлива</label>
             <select class="form-control mb-4" id="fuel_type" name="fuel_type">
