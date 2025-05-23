@@ -149,14 +149,16 @@
             <input type="text" class="form-control mb-3" id="model" name="model" autocomplete="off" disabled>
 
             <label for="year_from" class="form-label">Год от</label>
-            <select class="form-control mb-2" id="year_from" name="year_from">
+            <input type="number" class="form-control mb-2" id="year_from" name="year_from" list="year_from_options" inputmode="numeric" pattern="[0-9]*">
+            <datalist id="year_from_options">
                 <option value="">Не важно</option>
-            </select>
+            </datalist>
 
             <label for="year_to" class="form-label">Год до</label>
-            <select class="form-control mb-3" id="year_to" name="year_to">
+            <input type="number" class="form-control mb-3" id="year_to" name="year_to" list="year_to_options" inputmode="numeric" pattern="[0-9]*">
+            <datalist id="year_to_options">
                 <option value="">Не важно</option>
-            </select>
+            </datalist>
 
             <label for="price_from" class="form-label">Цена от</label>
             <input type="number" class="form-control mb-2" id="price_from" name="price_from" inputmode="numeric" pattern="[0-9]*">
@@ -216,10 +218,9 @@
             <label for="transmission" class="form-label">Коробка передач</label>
             <select class="form-control mb-4" id="transmission" name="transmission">
                 <option value="">Не важно</option>
-                <option value="Механическая">Механическая</option>
-                <option value="Автоматическая">Автоматическая</option>
-                <option value="Роботизированная">Роботизированная</option>
-                <option value="Вариатор">Вариатор</option>
+                <option value="Механика">Механика</option>
+                <option value="Автоматика">Автоматика</option>
+                <option value="Полуавтоматическая">Полуавтоматическая</option>
             </select>
 
             <button type="button" class="btn btn-success" id="subscribeBtn">Подписаться на авто</button>
@@ -295,20 +296,18 @@
             });
             modelInput.disabled = true;
             
-            // Заполнение выпадающих списков годов
-            const yearFrom = document.getElementById('year_from');
-            const yearTo = document.getElementById('year_to');
+            // Заполнение списков годов для datalist
+            const yearFromOptions = document.getElementById('year_from_options');
+            const yearToOptions = document.getElementById('year_to_options');
             const currentYear = new Date().getFullYear();
             for (let year = currentYear; year >= 1950; year--) {
                 const optionFrom = document.createElement('option');
                 optionFrom.value = year;
-                optionFrom.textContent = year;
-                yearFrom.appendChild(optionFrom);
+                yearFromOptions.appendChild(optionFrom);
                 
                 const optionTo = document.createElement('option');
                 optionTo.value = year;
-                optionTo.textContent = year;
-                yearTo.appendChild(optionTo);
+                yearToOptions.appendChild(optionTo);
             }
         });
 
@@ -394,10 +393,12 @@
                         <div class="card-body">
                             <h5 class="card-title">${auto.brand} ${auto.model}</h5>
                             <p class="card-text">
-                                Год: ${auto.year}<br>
-                                Цена: ${auto.price} €<br>
-                                Пробег: ${auto.mileage ? auto.mileage + ' км' : 'Не указано'}<br>
-                                Вид топлива: ${auto.fuel_type || 'Не указано'}
+                                Год: ${auto.year_min || ''} - ${auto.year_max || ''}<br>
+                                Цена: ${auto.price_min || ''} - ${auto.price_max || ''} €<br>
+                                Пробег: ${auto.mileage_min || ''} - ${auto.mileage_max || ''} км<br>
+                                Вид топлива: ${auto.fuel_type || 'Не указано'}<br>
+                                Мощность: ${auto.power_min || ''} - ${auto.power_max || ''} kW<br>
+                                Коробка передач: ${auto.gearbox || 'Не указано'}
                             </p>
                         </div>
                     </div>

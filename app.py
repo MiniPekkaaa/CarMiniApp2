@@ -93,12 +93,16 @@ def add_auto():
         result = mongo.db.CurrentAuto.insert_one({
             'brand': data.get('brand'),
             'model': data.get('model'),
-            'year': data.get('year'),
-            'price': data.get('price'),
-            'mileage': data.get('mileage'),
+            'year_min': data.get('year_min'),
+            'year_max': data.get('year_max'),
+            'price_min': data.get('price_min'),
+            'price_max': data.get('price_max'),
+            'mileage_min': data.get('mileage_min'),
+            'mileage_max': data.get('mileage_max'),
             'fuel_type': data.get('fuel_type'),
-            'power': data.get('power'),
-            'transmission': data.get('transmission'),
+            'power_min': data.get('power_min'),
+            'power_max': data.get('power_max'),
+            'gearbox': data.get('gearbox'),
             'created_at': datetime.now()
         })
         
@@ -130,37 +134,25 @@ def search_auto():
         if model:
             search_filter['model'] = model
         if year_from:
-            search_filter['year'] = {'$gte': int(year_from)}
+            search_filter['year_min'] = {'$gte': int(year_from)}
         if year_to:
-            if 'year' in search_filter:
-                search_filter['year']['$lte'] = int(year_to)
-            else:
-                search_filter['year'] = {'$lte': int(year_to)}
+            search_filter['year_max'] = {'$lte': int(year_to)}
         if price_from:
-            search_filter['price'] = {'$gte': float(price_from)}
+            search_filter['price_min'] = {'$gte': float(price_from)}
         if price_to:
-            if 'price' in search_filter:
-                search_filter['price']['$lte'] = float(price_to)
-            else:
-                search_filter['price'] = {'$lte': float(price_to)}
+            search_filter['price_max'] = {'$lte': float(price_to)}
         if mileage_from:
-            search_filter['mileage'] = {'$gte': float(mileage_from)}
+            search_filter['mileage_min'] = {'$gte': float(mileage_from)}
         if mileage_to:
-            if 'mileage' in search_filter:
-                search_filter['mileage']['$lte'] = float(mileage_to)
-            else:
-                search_filter['mileage'] = {'$lte': float(mileage_to)}
+            search_filter['mileage_max'] = {'$lte': float(mileage_to)}
         if fuel_type:
             search_filter['fuel_type'] = fuel_type
         if power_from:
-            search_filter['power'] = {'$gte': float(power_from)}
+            search_filter['power_min'] = {'$gte': float(power_from)}
         if power_to:
-            if 'power' in search_filter:
-                search_filter['power']['$lte'] = float(power_to)
-            else:
-                search_filter['power'] = {'$lte': float(power_to)}
+            search_filter['power_max'] = {'$lte': float(power_to)}
         if transmission:
-            search_filter['transmission'] = transmission
+            search_filter['gearbox'] = transmission
 
         # Ищем автомобили по фильтру
         autos = list(mongo.db.CurrentAuto.find(search_filter))
@@ -203,16 +195,29 @@ def subscribe_auto():
         # Проверяем, есть ли уже подписка
         if mongo.db.CurrentAuto.find_one({'user_id': str(user_id)}):
             return jsonify({'success': False, 'error': 'Уже есть подписка'}), 400
-        # Гарантируем, что все поля есть
-        for field in ['brand', 'model', 'year_from', 'year_to', 'price_from', 'price_to', 
-                     'mileage_from', 'mileage_to', 'fuel_type', 'power_from', 'power_to', 'transmission']:
-            if field not in data:
-                data[field] = ''
-        data['user_id'] = str(user_id)
+        
+        # Преобразуем данные в требуемый формат
+        formatted_data = {
+            'brand': data.get('brand', ''),
+            'model': data.get('model', ''),
+            'year_min': data.get('year_from', ''),
+            'year_max': data.get('year_to', ''),
+            'price_min': data.get('price_from', ''),
+            'price_max': data.get('price_to', ''),
+            'mileage_min': data.get('mileage_from', ''),
+            'mileage_max': data.get('mileage_to', ''),
+            'fuel_type': data.get('fuel_type', ''),
+            'power_min': data.get('power_from', ''),
+            'power_max': data.get('power_to', ''),
+            'gearbox': data.get('transmission', ''),
+            'user_id': str(user_id)
+        }
+        
         # Удаляем лишнее поле UserID если оно есть
-        if 'UserID' in data:
-            del data['UserID']
-        mongo.db.CurrentAuto.insert_one(data)
+        if 'UserID' in formatted_data:
+            del formatted_data['UserID']
+            
+        mongo.db.CurrentAuto.insert_one(formatted_data)
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error subscribing auto: {str(e)}")

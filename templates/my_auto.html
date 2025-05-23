@@ -77,16 +77,16 @@
             <h5 class="mb-3">Ваш автомобиль:</h5>
             <div><b>Марка:</b> {{ auto.brand or 'не важно' }}</div>
             <div><b>Модель:</b> {{ auto.model or 'не важно' }}</div>
-            <div><b>Год от:</b> {{ auto.year_from or 'не важно' }}</div>
-            <div><b>Год до:</b> {{ auto.year_to or 'не важно' }}</div>
-            <div><b>Цена от:</b> {{ auto.price_from or 'не важно' }}</div>
-            <div><b>Цена до:</b> {{ auto.price_to or 'не важно' }}</div>
-            <div><b>Пробег от:</b> {{ auto.mileage_from or 'не важно' }}</div>
-            <div><b>Пробег до:</b> {{ auto.mileage_to or 'не важно' }}</div>
+            <div><b>Год от:</b> {{ auto.year_min or 'не важно' }}</div>
+            <div><b>Год до:</b> {{ auto.year_max or 'не важно' }}</div>
+            <div><b>Цена от:</b> {{ auto.price_min or 'не важно' }}</div>
+            <div><b>Цена до:</b> {{ auto.price_max or 'не важно' }}</div>
+            <div><b>Пробег от:</b> {{ auto.mileage_min or 'не важно' }}</div>
+            <div><b>Пробег до:</b> {{ auto.mileage_max or 'не важно' }}</div>
             <div><b>Вид топлива:</b> {{ auto.fuel_type or 'не важно' }}</div>
-            <div><b>Мощность от, kW:</b> {{ auto.power_from or 'не важно' }}</div>
-            <div><b>Мощность до, kW:</b> {{ auto.power_to or 'не важно' }}</div>
-            <div><b>Коробка передач:</b> {{ auto.transmission or 'не важно' }}</div>
+            <div><b>Мощность от, kW:</b> {{ auto.power_min or 'не важно' }}</div>
+            <div><b>Мощность до, kW:</b> {{ auto.power_max or 'не важно' }}</div>
+            <div><b>Коробка передач:</b> {{ auto.gearbox or 'не важно' }}</div>
         </div>
         <button class="btn btn-secondary mb-2" id="changeBtn">Подписаться на другое авто</button>
         <button class="btn btn-danger mb-2" id="unsubscribeBtn">Отписаться от авто</button>
