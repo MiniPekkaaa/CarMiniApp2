@@ -4,38 +4,39 @@
 from pymongo import MongoClient
 import json
 from bson import json_util
+from config import Config
 
 try:
-    # MongoDB connection
-    client = MongoClient('mongodb://root:otlehjoq543680@46.101.121.75:27017/admin')
+    # MongoDB connection используя настройки из config.py
+    client = MongoClient(Config.MONGO_URI)
     
-    # Switch to Pivo database
-    db = client.Pivo
+    # Switch to Auto database
+    db = client.Auto
 
     # Check collections
     collections = db.list_collection_names()
-    print("Collections in Pivo database:")
+    print("Collections in Auto database:")
     print(collections)
 
-    if 'catalog' in collections:
-        # Check documents in catalog collection
-        print("\nFirst 3 documents from catalog collection:")
-        cursor = db.catalog.find().limit(3)
+    if Config.COLLECTION_CURRENT_AUTO in collections:
+        # Check documents in CurrentAuto collection
+        print(f"\nFirst 3 documents from {Config.COLLECTION_CURRENT_AUTO} collection:")
+        cursor = db[Config.COLLECTION_CURRENT_AUTO].find().limit(3)
         for doc in cursor:
             print(json.loads(json_util.dumps(doc)))
 
         # Count documents
-        count = db.catalog.count_documents({})
+        count = db[Config.COLLECTION_CURRENT_AUTO].count_documents({})
         print(f"\nTotal documents in collection: {count}")
 
         # Check document structure
         print("\nAll unique fields in collection:")
         all_fields = set()
-        for doc in db.catalog.find():
+        for doc in db[Config.COLLECTION_CURRENT_AUTO].find():
             all_fields.update(doc.keys())
         print(sorted(list(all_fields)))
     else:
-        print("Collection 'catalog' not found!")
+        print(f"Collection '{Config.COLLECTION_CURRENT_AUTO}' not found!")
 
 except Exception as e:
     print(f"MongoDB Error: {str(e)}")

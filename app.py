@@ -1,10 +1,9 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for
-from flask_pymongo import PyMongo
 import logging
-import redis
 from datetime import datetime
 import json
 import ast
+from config import Config, db_connections
 
 # Настройка логирования
 logging.basicConfig(
@@ -14,18 +13,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+app.config.from_object(Config)
 
-# Конфигурация MongoDB
-app.config["MONGO_URI"] = "mongodb://root:otlehjoq543680@46.101.121.75:27017/Auto?authSource=admin&directConnection=true"
-mongo = PyMongo(app)
-
-# Конфигурация Redis
-redis_client = redis.Redis(
-    host='46.101.121.75',
-    port=6379,
-    password='otlehjoq',
-    decode_responses=True
-)
+# Инициализация подключений к базам данных
+db_connections.init_app(app)
+mongo = db_connections.get_mongo()
+redis_client = db_connections.get_redis()
 
 def check_user_registration(user_id):
     try:
@@ -47,15 +40,6 @@ def check_user_registration(user_id):
         logger.error(f"Error checking Redis: {str(e)}")
         return False
 
-def check_admin_access(user_id):
-    try:
-        # Получаем значение Admin из Redis
-        admin_id = redis_client.hget('beer:setting', 'Admin')
-        logger.debug(f"Admin ID from Redis: {admin_id}, User ID: {user_id}")
-        return str(user_id) == str(admin_id)
-    except Exception as e:
-        logger.error(f"Error checking admin access: {str(e)}")
-        return False
 
 @app.route('/check-auth')
 def check_auth():
@@ -77,7 +61,7 @@ def index():
         if not user_id or not check_user_registration(user_id):
             return render_template('unauthorized.html')
         # Проверка подписки пользователя
-        sub = mongo.db.CurrentAuto.find_one({'user_id': str(user_id)})
+        sub = mongo.db[Config.COLLECTION_CURRENT_AUTO].find_one({'user_id': str(user_id)})
         if sub:
             return redirect(url_for('my_auto', user_id=user_id))
         return render_template('main_menu.html', user_id=user_id)
@@ -90,7 +74,7 @@ def add_auto():
     try:
         data = request.json
         # Добавляем автомобиль в коллекцию CurrentAuto
-        result = mongo.db.CurrentAuto.insert_one({
+        result = mongo.db[Config.COLLECTION_CURRENT_AUTO].insert_one({
             'brand': data.get('brand'),
             'model': data.get('model'),
             'year_min': data.get('year_min'),
@@ -155,7 +139,7 @@ def search_auto():
             search_filter['gearbox'] = transmission
 
         # Ищем автомобили по фильтру
-        autos = list(mongo.db.CurrentAuto.find(search_filter))
+        autos = list(mongo.db[Config.COLLECTION_CURRENT_AUTO].find(search_filter))
         
         # Преобразуем ObjectId в строку для JSON
         for auto in autos:
@@ -193,7 +177,7 @@ def subscribe_auto():
         if not user_id:
             return jsonify({'success': False, 'error': 'Нет user_id'}), 400
         # Проверяем, есть ли уже подписка
-        if mongo.db.CurrentAuto.find_one({'user_id': str(user_id)}):
+        if mongo.db[Config.COLLECTION_CURRENT_AUTO].find_one({'user_id': str(user_id)}):
             return jsonify({'success': False, 'error': 'Уже есть подписка'}), 400
         
         # Преобразуем данные в требуемый формат
@@ -217,7 +201,7 @@ def subscribe_auto():
         if 'UserID' in formatted_data:
             del formatted_data['UserID']
             
-        mongo.db.CurrentAuto.insert_one(formatted_data)
+        mongo.db[Config.COLLECTION_CURRENT_AUTO].insert_one(formatted_data)
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error subscribing auto: {str(e)}")
@@ -227,7 +211,7 @@ def subscribe_auto():
 def my_auto():
     try:
         user_id = request.args.get('user_id')
-        sub = mongo.db.CurrentAuto.find_one({'user_id': str(user_id)})
+        sub = mongo.db[Config.COLLECTION_CURRENT_AUTO].find_one({'user_id': str(user_id)})
         if not sub:
             return redirect(url_for('index', user_id=user_id))
         return render_template('my_auto.html', auto=sub, user_id=user_id)
@@ -241,7 +225,7 @@ def unsubscribe_auto():
         user_id = request.args.get('user_id') or request.json.get('user_id')
         if not user_id:
             return jsonify({'success': False, 'error': 'Нет user_id'}), 400
-        mongo.db.CurrentAuto.delete_one({'user_id': str(user_id)})
+        mongo.db[Config.COLLECTION_CURRENT_AUTO].delete_one({'user_id': str(user_id)})
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error unsubscribing auto: {str(e)}")

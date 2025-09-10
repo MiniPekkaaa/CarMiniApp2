@@ -79,8 +79,8 @@
             <div><b>Модель:</b> {{ auto.model or 'не важно' }}</div>
             <div><b>Год от:</b> {{ auto.year_min or 'не важно' }}</div>
             <div><b>Год до:</b> {{ auto.year_max or 'не важно' }}</div>
-            <div><b>Цена от:</b> {{ auto.price_min or 'не важно' }}</div>
-            <div><b>Цена до:</b> {{ auto.price_max or 'не важно' }}</div>
+            <div><b>Цена от:</b> {{ auto.price_min or 'не важно' }}{% if auto.price_min %} €{% endif %}</div>
+            <div><b>Цена до:</b> {{ auto.price_max or 'не важно' }}{% if auto.price_max %} €{% endif %}</div>
             <div><b>Пробег от:</b> {{ auto.mileage_min or 'не важно' }}</div>
             <div><b>Пробег до:</b> {{ auto.mileage_max or 'не важно' }}</div>
             <div><b>Вид топлива:</b> {{ auto.fuel_type or 'не важно' }}</div>

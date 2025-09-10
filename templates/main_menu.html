@@ -160,10 +160,10 @@
                 <option value="">Не важно</option>
             </datalist>
 
-            <label for="price_from" class="form-label">Цена от</label>
+            <label for="price_from" class="form-label">Цена от (€)</label>
             <input type="number" class="form-control mb-2" id="price_from" name="price_from" inputmode="numeric" pattern="[0-9]*">
 
-            <label for="price_to" class="form-label">Цена до</label>
+            <label for="price_to" class="form-label">Цена до (€)</label>
             <input type="number" class="form-control mb-3" id="price_to" name="price_to" inputmode="numeric" pattern="[0-9]*">
 
             <label for="mileage_from" class="form-label">Пробег от, км</label>
@@ -302,7 +302,8 @@
             const yearFromOptions = document.getElementById('year_from_options');
             const yearToOptions = document.getElementById('year_to_options');
             const currentYear = new Date().getFullYear();
-            for (let year = currentYear; year >= 1950; year--) {
+            const minYear = currentYear - 5; // Максимум 5 лет назад
+            for (let year = currentYear; year >= minYear; year--) {
                 const optionFrom = document.createElement('option');
                 optionFrom.value = year;
                 yearFromOptions.appendChild(optionFrom);
