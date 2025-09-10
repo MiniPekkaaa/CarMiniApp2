@@ -149,14 +149,16 @@
             <input type="text" class="form-control mb-3" id="model" name="model" autocomplete="off" disabled>
 
             <label for="year_from" class="form-label">Год от</label>
-            <select class="form-control mb-2" id="year_from" name="year_from">
+            <input type="number" class="form-control mb-2" id="year_from" name="year_from" list="year_from_options" inputmode="numeric" pattern="[0-9]*">
+            <datalist id="year_from_options">
                 <option value="">Не важно</option>
-            </select>
+            </datalist>
 
             <label for="year_to" class="form-label">Год до</label>
-            <select class="form-control mb-3" id="year_to" name="year_to">
+            <input type="number" class="form-control mb-3" id="year_to" name="year_to" list="year_to_options" inputmode="numeric" pattern="[0-9]*">
+            <datalist id="year_to_options">
                 <option value="">Не важно</option>
-            </select>
+            </datalist>
 
             <label for="price_from" class="form-label">Цена от (€)</label>
             <input type="number" class="form-control mb-2" id="price_from" name="price_from" inputmode="numeric" pattern="[0-9]*">
@@ -296,21 +298,19 @@
             });
             modelInput.disabled = true;
             
-            // Заполнение списков годов для select
-            const yearFromSelect = document.getElementById('year_from');
-            const yearToSelect = document.getElementById('year_to');
+            // Заполнение списков годов для datalist
+            const yearFromOptions = document.getElementById('year_from_options');
+            const yearToOptions = document.getElementById('year_to_options');
             const currentYear = new Date().getFullYear();
             const minYear = currentYear - 5; // Максимум 5 лет назад
             for (let year = currentYear; year >= minYear; year--) {
                 const optionFrom = document.createElement('option');
                 optionFrom.value = year;
-                optionFrom.textContent = year;
-                yearFromSelect.appendChild(optionFrom);
+                yearFromOptions.appendChild(optionFrom);
                 
                 const optionTo = document.createElement('option');
                 optionTo.value = year;
-                optionTo.textContent = year;
-                yearToSelect.appendChild(optionTo);
+                yearToOptions.appendChild(optionTo);
             }
         });
 
@@ -409,11 +409,13 @@
                 resultsDiv.appendChild(autoCard);
             });
         }
-        // Ограничение только на цифры для полей 'Цена', 'Пробег'
+        // Ограничение только на цифры для полей 'Год', 'Цена до', 'Пробег до'
         function onlyDigitsInput(e) {
             let v = e.target.value.replace(/\D/g, '');
             if (e.target.value !== v) e.target.value = v;
         }
+        document.getElementById('year_from').addEventListener('input', onlyDigitsInput);
+        document.getElementById('year_to').addEventListener('input', onlyDigitsInput);
         document.getElementById('price_from').addEventListener('input', onlyDigitsInput);
         document.getElementById('price_to').addEventListener('input', onlyDigitsInput);
         document.getElementById('mileage_from').addEventListener('input', onlyDigitsInput);
