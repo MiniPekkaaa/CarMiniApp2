@@ -12,7 +12,7 @@ class Config:
     
     # MongoDB настройки
     MONGODB_HOST = "46.101.121.75"
-    MONGODB_PORT = 27017
+    MONGODB_PORT = 27017го
     MONGODB_USERNAME = "root"
     MONGODB_PASSWORD = "otlehjoq543680"
     MONGODB_DATABASE = "Auto"
