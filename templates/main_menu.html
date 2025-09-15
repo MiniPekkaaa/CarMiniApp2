@@ -342,7 +342,7 @@
                 displayResults(data);
             } catch (error) {
                 console.error('Error:', error);
-                alert('Ошибка при поиске автомобилей');
+                showToast('Ошибка при поиске автомобилей', 'error');
             }
         });
         // Получаем user_id из Telegram WebApp или из URL
@@ -357,9 +357,10 @@
             return user_id;
         }
 
-        function showToast(msg) {
+        function showToast(msg, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
+            toast.style.backgroundColor = (type === 'error') ? '#b91c1c' : '#23272f';
             toast.className = 'show';
             setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 2000);
         }
@@ -370,7 +371,7 @@
             
             // Проверяем обязательные поля
             if (!yearFrom || !yearTo) {
-                alert('Пожалуйста, выберите год от и год до');
+                showToast('Пожалуйста, выберите год от и год до', 'error');
                 return;
             }
             
@@ -397,11 +398,11 @@
                         window.location.href = '/my_auto?user_id=' + user_id;
                     }, 1000);
                 } else {
-                    alert(result.error || 'Ошибка при подписке на автомобиль');
+                    showToast(result.error || 'Ошибка при подписке на автомобиль', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Ошибка при подписке на автомобиль');
+                showToast('Ошибка при подписке на автомобиль', 'error');
             }
         });
         function displayResults(autos) {
