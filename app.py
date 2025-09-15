@@ -236,9 +236,15 @@ def unsubscribe_auto():
         # Удаляем подписку из коллекции CurrentAuto
         mongo.db[Config.COLLECTION_CURRENT_AUTO].delete_one({'user_id': str(user_id)})
         
-        # Удаляем данные пользователя из коллекции UsersAuto
-        mongo.db['UsersAuto'].delete_many({'userID': str(user_id)})
-        logger.debug(f"Deleted user data from UsersAuto for user_id: {user_id}")
+        # Удаляем данные пользователя из коллекции UsersAuto по возможным полям идентификатора
+        usersauto_delete_result = mongo.db['UsersAuto'].delete_many({
+            '$or': [
+                {'userId': str(user_id)},  # как на вашем скриншоте
+                {'userID': str(user_id)},  # возможная вариация регистра
+                {'user_id': str(user_id)}  # как используется в других коллекциях
+            ]
+        })
+        logger.debug(f"UsersAuto deleted_count={usersauto_delete_result.deleted_count} for user_id={user_id}")
         
         return jsonify({'success': True})
     except Exception as e:
