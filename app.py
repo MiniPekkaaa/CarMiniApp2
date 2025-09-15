@@ -176,6 +176,13 @@ def subscribe_auto():
         user_id = request.args.get('user_id') or data.get('user_id')
         if not user_id:
             return jsonify({'success': False, 'error': 'Нет user_id'}), 400
+        
+        # Проверяем обязательные поля
+        year_from = data.get('year_from', '')
+        year_to = data.get('year_to', '')
+        if not year_from or not year_to:
+            return jsonify({'success': False, 'error': 'Необходимо выбрать год от и год до'}), 400
+        
         # Проверяем, есть ли уже подписка
         if mongo.db[Config.COLLECTION_CURRENT_AUTO].find_one({'user_id': str(user_id)}):
             return jsonify({'success': False, 'error': 'Уже есть подписка'}), 400
@@ -184,8 +191,8 @@ def subscribe_auto():
         formatted_data = {
             'brand': data.get('brand', ''),
             'model': data.get('model', ''),
-            'year_min': data.get('year_from', ''),
-            'year_max': data.get('year_to', ''),
+            'year_min': year_from,
+            'year_max': year_to,
             'price_min': data.get('price_from', ''),
             'price_max': data.get('price_to', ''),
             'mileage_min': data.get('mileage_from', ''),
@@ -225,7 +232,14 @@ def unsubscribe_auto():
         user_id = request.args.get('user_id') or request.json.get('user_id')
         if not user_id:
             return jsonify({'success': False, 'error': 'Нет user_id'}), 400
+        
+        # Удаляем подписку из коллекции CurrentAuto
         mongo.db[Config.COLLECTION_CURRENT_AUTO].delete_one({'user_id': str(user_id)})
+        
+        # Удаляем данные пользователя из коллекции UsersAuto
+        mongo.db['UsersAuto'].delete_many({'userID': str(user_id)})
+        logger.debug(f"Deleted user data from UsersAuto for user_id: {user_id}")
+        
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error unsubscribing auto: {str(e)}")

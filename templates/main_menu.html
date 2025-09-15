@@ -149,13 +149,11 @@
             <input type="text" class="form-control mb-3" id="model" name="model" autocomplete="off" disabled>
 
             <label for="year_from" class="form-label">Год от</label>
-            <select class="form-control mb-2" id="year_from" name="year_from">
-                <option value="">Не важно</option>
+            <select class="form-control mb-2" id="year_from" name="year_from" required>
             </select>
 
             <label for="year_to" class="form-label">Год до</label>
-            <select class="form-control mb-3" id="year_to" name="year_to">
-                <option value="">Не важно</option>
+            <select class="form-control mb-3" id="year_to" name="year_to" required>
             </select>
 
             <label for="price_from" class="form-label">Цена от (€)</label>
@@ -300,7 +298,23 @@
             const yearFromSelect = document.getElementById('year_from');
             const yearToSelect = document.getElementById('year_to');
             const currentYear = new Date().getFullYear();
-            const minYear = currentYear - 5; // Максимум 5 лет назад
+            const minYear = currentYear - 30; // Расширим диапазон до 30 лет
+            
+            // Добавляем placeholder опции
+            const placeholderFrom = document.createElement('option');
+            placeholderFrom.value = '';
+            placeholderFrom.textContent = 'Выберите год от';
+            placeholderFrom.disabled = true;
+            placeholderFrom.selected = true;
+            yearFromSelect.appendChild(placeholderFrom);
+            
+            const placeholderTo = document.createElement('option');
+            placeholderTo.value = '';
+            placeholderTo.textContent = 'Выберите год до';
+            placeholderTo.disabled = true;
+            placeholderTo.selected = true;
+            yearToSelect.appendChild(placeholderTo);
+            
             for (let year = currentYear; year >= minYear; year--) {
                 const optionFrom = document.createElement('option');
                 optionFrom.value = year;
@@ -351,6 +365,15 @@
         }
 
         document.getElementById('subscribeBtn').addEventListener('click', async () => {
+            const yearFrom = document.getElementById('year_from').value;
+            const yearTo = document.getElementById('year_to').value;
+            
+            // Проверяем обязательные поля
+            if (!yearFrom || !yearTo) {
+                alert('Пожалуйста, выберите год от и год до');
+                return;
+            }
+            
             const formData = new FormData(document.getElementById('searchForm'));
             const autoData = {};
             for (let [key, value] of formData.entries()) {
