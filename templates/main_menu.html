@@ -141,6 +141,7 @@
 <body>
     <div class="container">
         <h1 class="mb-4">Поиск автомобилей</h1>
+        <button type="button" class="btn btn-primary" id="backBtn" style="display:none">Назад к моему авто</button>
         <form id="searchForm">
             <label for="brand" class="form-label">Марка</label>
             <input type="text" class="form-control mb-3" id="brand" name="brand" autocomplete="off">
@@ -364,6 +365,23 @@
             toast.className = 'show';
             setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 2000);
         }
+
+        // Показать кнопку "Назад" в режиме смены авто
+        (function setupBackButton(){
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('change') === '1') {
+                const backBtn = document.getElementById('backBtn');
+                backBtn.style.display = 'block';
+                backBtn.addEventListener('click', () => {
+                    const user_id = getUserId();
+                    if (user_id) {
+                        window.location.href = '/my_auto?user_id=' + user_id;
+                    } else {
+                        window.history.back();
+                    }
+                });
+            }
+        })();
 
         document.getElementById('subscribeBtn').addEventListener('click', async () => {
             const yearFrom = document.getElementById('year_from').value;
