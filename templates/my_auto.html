@@ -103,13 +103,8 @@
             toast.className = 'show';
             setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 1500);
         }
-        document.getElementById('changeBtn').onclick = async function() {
-            await fetch('/unsubscribe_auto', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id })
-            });
-            window.location.href = '/?user_id=' + user_id;
+        document.getElementById('changeBtn').onclick = function() {
+            window.location.href = '/?user_id=' + user_id + '&change=1';
         };
         document.getElementById('unsubscribeBtn').onclick = async function() {
             await fetch('/unsubscribe_auto', {

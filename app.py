@@ -58,11 +58,12 @@ def check_auth():
 def index():
     try:
         user_id = request.args.get('user_id')
+        change_mode = request.args.get('change') == '1'
         if not user_id or not check_user_registration(user_id):
             return render_template('unauthorized.html')
         # Проверка подписки пользователя
         sub = mongo.db[Config.COLLECTION_CURRENT_AUTO].find_one({'user_id': str(user_id)})
-        if sub:
+        if sub and not change_mode:
             return redirect(url_for('my_auto', user_id=user_id))
         return render_template('main_menu.html', user_id=user_id)
     except Exception as e:
@@ -183,10 +184,6 @@ def subscribe_auto():
         if not year_from or not year_to:
             return jsonify({'success': False, 'error': 'Необходимо выбрать год от и год до'}), 400
         
-        # Проверяем, есть ли уже подписка
-        if mongo.db[Config.COLLECTION_CURRENT_AUTO].find_one({'user_id': str(user_id)}):
-            return jsonify({'success': False, 'error': 'Уже есть подписка'}), 400
-        
         # Преобразуем данные в требуемый формат
         formatted_data = {
             'brand': data.get('brand', ''),
@@ -207,8 +204,27 @@ def subscribe_auto():
         # Удаляем лишнее поле UserID если оно есть
         if 'UserID' in formatted_data:
             del formatted_data['UserID']
-            
-        mongo.db[Config.COLLECTION_CURRENT_AUTO].insert_one(formatted_data)
+        
+        # Заменяем существующую подписку или создаем новую (upsert)
+        replace_result = mongo.db[Config.COLLECTION_CURRENT_AUTO].replace_one(
+            {'user_id': str(user_id)},
+            formatted_data,
+            upsert=True
+        )
+
+        # После успешной замены удаляем связанные данные пользователя из UsersAuto
+        usersauto_delete_result = mongo.db['UsersAuto'].delete_many({
+            '$or': [
+                {'userId': str(user_id)},
+                {'userID': str(user_id)},
+                {'user_id': str(user_id)}
+            ]
+        })
+        logger.debug(
+            f"subscribe_auto: replaced={replace_result.matched_count}, upserted_id={replace_result.upserted_id}, "
+            f"UsersAuto.deleted={usersauto_delete_result.deleted_count} for user_id={user_id}"
+        )
+
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error subscribing auto: {str(e)}")
