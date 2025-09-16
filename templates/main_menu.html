@@ -309,12 +309,7 @@
             placeholderFrom.selected = true;
             yearFromSelect.appendChild(placeholderFrom);
             
-            const placeholderTo = document.createElement('option');
-            placeholderTo.value = '';
-            placeholderTo.textContent = 'Выберите год до';
-            placeholderTo.disabled = true;
-            placeholderTo.selected = true;
-            yearToSelect.appendChild(placeholderTo);
+            // Для поля "Год до" placeholder не ставим — по умолчанию выбран текущий год
             
             for (let year = currentYear; year >= minYear; year--) {
                 const optionFrom = document.createElement('option');
@@ -326,6 +321,10 @@
                 optionTo.value = year;
                 optionTo.textContent = year;
                 yearToSelect.appendChild(optionTo);
+            }
+            // По умолчанию в "Год до" выбран текущий год (первый элемент)
+            if (yearToSelect.options.length > 0) {
+                yearToSelect.selectedIndex = 0;
             }
         });
 
@@ -385,12 +384,17 @@
 
         document.getElementById('subscribeBtn').addEventListener('click', async () => {
             const yearFrom = document.getElementById('year_from').value;
-            const yearTo = document.getElementById('year_to').value;
+            let yearTo = document.getElementById('year_to').value;
             
             // Проверяем обязательные поля
-            if (!yearFrom || !yearTo) {
+            if (!yearFrom) {
                 showToast('Пожалуйста, выберите год от и год до', 'error');
                 return;
+            }
+            // Если Год до не задан, используем текущий год
+            if (!yearTo) {
+                yearTo = String(new Date().getFullYear());
+                document.getElementById('year_to').value = yearTo;
             }
             
             const formData = new FormData(document.getElementById('searchForm'));
@@ -398,6 +402,7 @@
             for (let [key, value] of formData.entries()) {
                 if (value) autoData[key] = value;
             }
+            if (!autoData.year_to) autoData.year_to = yearTo;
             let user_id = getUserId();
             if (user_id) autoData.user_id = user_id;
             try {
