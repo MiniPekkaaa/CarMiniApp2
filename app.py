@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timedelta
 import json
 import ast
+from urllib import request as urllib_request
 from config import Config, db_connections
 
 # Настройка логирования
@@ -19,6 +20,23 @@ app.config.from_object(Config)
 db_connections.init_app(app)
 mongo = db_connections.get_mongo()
 redis_client = db_connections.get_redis()
+
+WEBHOOK_URL = "https://n8n.stage.3r.agency/webhook/8bfa4263-a3b3-4320-9230-6ddeccb7014e"
+
+def notify_subscription_webhook(user_id: str) -> None:
+    try:
+        payload_bytes = json.dumps({'user_id': str(user_id)}).encode('utf-8')
+        req = urllib_request.Request(
+            WEBHOOK_URL,
+            data=payload_bytes,
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        with urllib_request.urlopen(req, timeout=5) as resp:
+            status_code = resp.getcode()
+        logger.debug(f"Webhook sent for user_id={user_id}, status={status_code}")
+    except Exception as e:
+        logger.error(f"Error sending webhook for user_id={user_id}: {str(e)}")
 
 def check_user_registration(user_id):
     try:
@@ -254,6 +272,9 @@ def subscribe_auto():
             redis_client.hset(redis_key, 'last_subscription', now_str)
         except Exception as e:
             logger.error(f"Error writing last_subscription to Redis for user {user_id}: {str(e)}")
+        
+        # Отправляем webhook о создании/обновлении подписки
+        notify_subscription_webhook(str(user_id))
 
         return jsonify({'success': True})
     except Exception as e:

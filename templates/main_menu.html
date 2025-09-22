@@ -126,7 +126,7 @@
         }
         #toast.show {
             visibility: visible;
-            animation: fadein 0.3s, fadeout 0.3s 1.7s;
+            animation: fadein 0.3s, fadeout 0.3s 7.7s;
         }
         @keyframes fadein {
             from {bottom: 20px; opacity: 0;}
@@ -362,7 +362,7 @@
             toast.textContent = msg;
             toast.style.backgroundColor = (type === 'error') ? '#b91c1c' : '#23272f';
             toast.className = 'show';
-            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 2000);
+            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 8000);
         }
 
         // Показать кнопку "Назад" в режиме смены авто

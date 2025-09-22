@@ -58,7 +58,7 @@
         }
         #toast.show {
             visibility: visible;
-            animation: fadein 0.3s, fadeout 0.3s 1.2s;
+            animation: fadein 0.3s, fadeout 0.3s 7.7s;
         }
         @keyframes fadein {
             from {bottom: 20px; opacity: 0;}
@@ -101,7 +101,7 @@
             const toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.className = 'show';
-            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 1500);
+            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 8000);
         }
         document.getElementById('changeBtn').onclick = function() {
             window.location.href = '/?user_id=' + user_id + '&change=1';
