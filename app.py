@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import ast
 from config import Config, db_connections
@@ -184,6 +184,29 @@ def subscribe_auto():
         if not year_from or not year_to:
             return jsonify({'success': False, 'error': 'Необходимо выбрать год от и год до'}), 400
         
+        # Ограничение: не чаще одного раза в 3 часа
+        redis_key = f'auto:user:{user_id}'
+        try:
+            last_sub_str = redis_client.hget(redis_key, 'last_subscription')
+        except Exception as e:
+            logger.error(f"Error reading last_subscription from Redis for user {user_id}: {str(e)}")
+            last_sub_str = None
+        if last_sub_str:
+            try:
+                last_dt = datetime.strptime(last_sub_str, '%d.%m.%y %H:%M')
+                elapsed = datetime.now() - last_dt
+                if elapsed < timedelta(hours=3):
+                    remaining = timedelta(hours=3) - elapsed
+                    remaining_hours = int(remaining.total_seconds() // 3600)
+                    remaining_minutes = int((remaining.total_seconds() % 3600) // 60)
+                    return jsonify({
+                        'success': False,
+                        'error': f'Нельзя создавать новую подписку чаще, чем раз в 3 часа. Подождите ещё {remaining_hours} ч {remaining_minutes} мин.'
+                    }), 400
+            except Exception as parse_err:
+                # Если формат даты некорректный — не блокируем, а перезапишем при успешной операции
+                logger.warning(f"Invalid last_subscription format for user {user_id}: {last_sub_str}. Error: {parse_err}")
+        
         # Преобразуем данные в требуемый формат
         formatted_data = {
             'brand': data.get('brand', ''),
@@ -224,6 +247,13 @@ def subscribe_auto():
             f"subscribe_auto: replaced={replace_result.matched_count}, upserted_id={replace_result.upserted_id}, "
             f"UsersAuto.deleted={usersauto_delete_result.deleted_count} for user_id={user_id}"
         )
+
+        # Обновляем отметку времени последней подписки в Redis
+        try:
+            now_str = datetime.now().strftime('%d.%m.%y %H:%M')
+            redis_client.hset(redis_key, 'last_subscription', now_str)
+        except Exception as e:
+            logger.error(f"Error writing last_subscription to Redis for user {user_id}: {str(e)}")
 
         return jsonify({'success': True})
     except Exception as e:
