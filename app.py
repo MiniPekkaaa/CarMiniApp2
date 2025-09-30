@@ -22,6 +22,7 @@ mongo = db_connections.get_mongo()
 redis_client = db_connections.get_redis()
 
 WEBHOOK_URL = "https://n8n.stage.3r.agency/webhook/8bfa4263-a3b3-4320-9230-6ddeccb7014e"
+WEBHOOK_URL_AUTO = "https://n8n.stage.3r.agency/webhook/6584c5b9-80af-46a5-a3a8-d9bd104b771e"
 
 def notify_subscription_webhook(user_id: str) -> None:
     try:
@@ -37,6 +38,21 @@ def notify_subscription_webhook(user_id: str) -> None:
         logger.debug(f"Webhook sent for user_id={user_id}, status={status_code}")
     except Exception as e:
         logger.error(f"Error sending webhook for user_id={user_id}: {str(e)}")
+
+def notify_auto_subscription_webhook(brand: str, model: str) -> None:
+    try:
+        payload_bytes = json.dumps({'brand': brand, 'model': model}).encode('utf-8')
+        req = urllib_request.Request(
+            WEBHOOK_URL_AUTO,
+            data=payload_bytes,
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        with urllib_request.urlopen(req, timeout=5) as resp:
+            status_code = resp.getcode()
+        logger.debug(f"Auto webhook sent for brand={brand}, model={model}, status={status_code}")
+    except Exception as e:
+        logger.error(f"Error sending auto webhook for brand={brand}, model={model}: {str(e)}")
 
 def check_user_registration(user_id):
     try:
@@ -275,6 +291,12 @@ def subscribe_auto():
         
         # Отправляем webhook о создании/обновлении подписки
         notify_subscription_webhook(str(user_id))
+        
+        # Отправляем webhook с маркой и моделью автомобиля
+        notify_auto_subscription_webhook(
+            formatted_data.get('brand', ''),
+            formatted_data.get('model', '')
+        )
 
         return jsonify({'success': True})
     except Exception as e:
