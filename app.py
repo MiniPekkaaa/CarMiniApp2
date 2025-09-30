@@ -39,9 +39,9 @@ def notify_subscription_webhook(user_id: str) -> None:
     except Exception as e:
         logger.error(f"Error sending webhook for user_id={user_id}: {str(e)}")
 
-def notify_auto_subscription_webhook(brand: str, model: str) -> None:
+def notify_auto_subscription_webhook(brand: str, model: str, user_id: str) -> None:
     try:
-        payload_bytes = json.dumps({'brand': brand, 'model': model}).encode('utf-8')
+        payload_bytes = json.dumps({'brand': brand, 'model': model, 'userID': user_id}).encode('utf-8')
         req = urllib_request.Request(
             WEBHOOK_URL_AUTO,
             data=payload_bytes,
@@ -50,9 +50,9 @@ def notify_auto_subscription_webhook(brand: str, model: str) -> None:
         )
         with urllib_request.urlopen(req, timeout=5) as resp:
             status_code = resp.getcode()
-        logger.debug(f"Auto webhook sent for brand={brand}, model={model}, status={status_code}")
+        logger.debug(f"Auto webhook sent for brand={brand}, model={model}, user_id={user_id}, status={status_code}")
     except Exception as e:
-        logger.error(f"Error sending auto webhook for brand={brand}, model={model}: {str(e)}")
+        logger.error(f"Error sending auto webhook for brand={brand}, model={model}, user_id={user_id}: {str(e)}")
 
 def check_user_registration(user_id):
     try:
@@ -292,10 +292,11 @@ def subscribe_auto():
         # Отправляем webhook о создании/обновлении подписки
         notify_subscription_webhook(str(user_id))
         
-        # Отправляем webhook с маркой и моделью автомобиля
+        # Отправляем webhook с маркой, моделью и userID автомобиля
         notify_auto_subscription_webhook(
             formatted_data.get('brand', ''),
-            formatted_data.get('model', '')
+            formatted_data.get('model', ''),
+            str(user_id)
         )
 
         return jsonify({'success': True})
